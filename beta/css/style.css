@@ -1,0 +1,850 @@
+/* 全局样式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Microsoft YaHei', sans-serif;
+    -webkit-tap-highlight-color: transparent; /* 移除移动端点击高亮 */
+}
+
+body {
+    background-color: #f5f5f5;
+    color: #333;
+    line-height: 1.6;
+    overflow-x: hidden; /* 防止水平溢出 */
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 15px;
+}
+
+/* 头部样式 */
+header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+}
+
+.logo img {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+.logo h1 {
+    font-size: 20px;
+    color: #2c3e50;
+}
+
+nav ul {
+    display: flex;
+    list-style: none;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+nav ul li {
+    margin-left: 10px;
+    margin-bottom: 5px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: #7f8c8d;
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    display: block;
+    text-align: center;
+}
+
+nav ul li a:hover {
+    color: #3498db;
+    background-color: #ecf0f1;
+}
+
+nav ul li a.active {
+    color: #fff;
+    background-color: #3498db;
+}
+
+/* 移动端导航样式 */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        padding: 10px 0;
+    }
+    
+    .logo {
+        margin-bottom: 15px;
+    }
+    
+    nav ul {
+        width: 100%;
+        justify-content: space-around;
+    }
+    
+    nav ul li {
+        margin: 0 5px 5px;
+    }
+    
+    nav ul li a {
+        padding: 6px 10px;
+        font-size: 14px;
+    }
+}
+
+/* 主内容区域 */
+main {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    min-height: 500px;
+    overflow: hidden; /* 防止内容溢出 */
+}
+
+section {
+    display: none;
+}
+
+section.section-active {
+    display: block;
+}
+
+/* 控制区域 */
+.controls {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e0e0e0;
+    flex-wrap: wrap;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    width: 100%;
+    max-width: 300px;
+}
+
+.search-box input {
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px 0 0 4px;
+    width: 100%;
+    font-size: 16px; /* 增大字体便于移动端输入 */
+    height: 44px; /* 增大高度便于触摸 */
+}
+
+.search-box button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 0 15px;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+    height: 44px; /* 与输入框高度一致 */
+    min-width: 44px; /* 确保按钮足够大，便于触摸 */
+}
+
+.filter-options {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.filter-options select {
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-right: 15px;
+    font-size: 16px;
+    height: 44px; /* 增大高度便于触摸 */
+    margin-bottom: 10px;
+}
+
+.page-controls {
+    display: flex;
+    align-items: center;
+    margin-top: 5px;
+}
+
+.page-controls button {
+    background-color: #ecf0f1;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 0 5px;
+    min-width: 44px; /* 确保按钮足够大，便于触摸 */
+    min-height: 44px;
+}
+
+.page-controls button:hover {
+    background-color: #dfe6e9;
+}
+
+#page-info {
+    margin: 0 10px;
+    font-size: 14px;
+}
+
+/* 移动端控制区域样式 */
+@media (max-width: 768px) {
+    .controls {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .search-box {
+        width: 100%;
+        max-width: none;
+        margin-bottom: 15px;
+    }
+    
+    .filter-options {
+        width: 100%;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+    
+    .filter-options select {
+        width: 48%;
+        margin-right: 0;
+    }
+    
+    .page-controls {
+        width: 100%;
+        justify-content: center;
+        margin-top: 10px;
+    }
+}
+
+/* 单词卡片 */
+.word-container {
+    display: flex;
+    gap: 20px;
+    flex-direction: row;
+}
+
+.word-card {
+    flex: 2;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+}
+
+.word-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.word-id {
+    background-color: #3498db;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.star-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 24px; /* 增大图标便于触摸 */
+    color: #f1c40f;
+    padding: 5px; /* 增加点击区域 */
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.word-content {
+    margin-bottom: 20px;
+}
+
+/* 移动端单词卡片样式 */
+@media (max-width: 768px) {
+    .word-container {
+        flex-direction: column;
+    }
+    
+    .word-card {
+        flex: none;
+        width: 100%;
+    }
+}
+
+.word-text {
+    font-size: 32px;
+    margin-bottom: 10px;
+    color: #2c3e50;
+    word-break: break-word; /* 防止长单词溢出 */
+}
+
+.pronunciation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    font-size: 16px;
+    color: #7f8c8d;
+    flex-wrap: wrap; /* 允许在小屏幕上换行 */
+}
+
+.audio-controls {
+    display: flex;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.accent-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    min-width: 44px; /* 增大触摸区域 */
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.accent-btn img {
+    width: 24px;
+    height: 16px;
+}
+
+.meaning {
+    font-size: 18px;
+    line-height: 1.6;
+    color: #34495e;
+    word-break: break-word; /* 防止长文本溢出 */
+}
+
+/* 移动端文本样式 */
+@media (max-width: 768px) {
+    .word-text {
+        font-size: 28px;
+    }
+    
+    .pronunciation {
+        font-size: 14px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .audio-controls {
+        margin-top: 10px;
+        align-self: flex-end;
+    }
+    
+    .meaning {
+        font-size: 16px;
+    }
+}
+
+.word-footer {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap; /* 允许在小屏幕上换行 */
+    gap: 10px;
+}
+
+.mark-learned-btn, .auto-play-btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    min-height: 44px; /* 增大触摸区域 */
+    min-width: 44px;
+    flex: 1; /* 允许按钮在小屏幕上平均分配空间 */
+}
+
+.mark-learned-btn {
+    background-color: #2ecc71;
+    color: white;
+}
+
+.auto-play-btn {
+    background-color: #ecf0f1;
+    color: #2c3e50;
+}
+
+/* 单词列表 */
+.word-list {
+    flex: 1;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    max-height: 500px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* 平滑滚动 */
+}
+
+.word-list h3 {
+    margin-bottom: 15px;
+    color: #2c3e50;
+    font-size: 18px;
+}
+
+.word-list ul {
+    list-style: none;
+}
+
+.word-list li {
+    padding: 12px 10px; /* 增大高度便于触摸 */
+    border-bottom: 1px solid #e0e0e0;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    min-height: 44px; /* 确保触摸区域足够大 */
+}
+
+.word-list li:hover {
+    background-color: #f5f5f5;
+}
+
+.word-list li.active {
+    background-color: #ecf0f1;
+    font-weight: bold;
+}
+
+/* 移动端单词列表样式 */
+@media (max-width: 768px) {
+    .word-list {
+        max-height: 300px; /* 减小列表高度 */
+    }
+    
+    .word-list li {
+        padding: 15px 10px; /* 进一步增大触摸区域 */
+    }
+}
+
+/* 测试模式 */
+.test-controls {
+    margin-bottom: 20px;
+}
+
+.test-options {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap; /* 允许在小屏幕上换行 */
+}
+
+.test-options select {
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    height: 44px; /* 增大触摸区域 */
+    flex: 1;
+    min-width: 120px;
+}
+
+.test-options button {
+    padding: 10px 15px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    min-height: 44px; /* 增大触摸区域 */
+    min-width: 100px;
+}
+
+.test-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.test-progress {
+    margin-bottom: 20px;
+}
+
+.progress-bar {
+    height: 8px;
+    background-color: #ecf0f1;
+    border-radius: 4px;
+    margin-bottom: 5px;
+}
+
+.progress-fill {
+    height: 100%;
+    background-color: #3498db;
+    border-radius: 4px;
+    width: 5%; /* 初始进度 */
+}
+
+.progress-text {
+    font-size: 14px;
+    color: #7f8c8d;
+}
+
+.test-question {
+    margin-bottom: 20px;
+}
+
+.test-question h3 {
+    font-size: 18px;
+    color: #2c3e50;
+    word-break: break-word; /* 防止长文本溢出 */
+}
+
+.test-options .option {
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-height: 44px; /* 确保触摸区域足够大 */
+}
+
+.test-options .option:hover {
+    background-color: #f5f5f5;
+}
+
+.test-options .option.selected {
+    background-color: #3498db;
+    color: white;
+    border-color: #3498db;
+}
+
+.test-footer {
+    margin-top: 20px;
+    text-align: right;
+}
+
+.test-footer button {
+    padding: 10px 20px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    min-height: 44px; /* 增大触摸区域 */
+    min-width: 100px;
+}
+
+/* 移动端测试模式样式 */
+@media (max-width: 768px) {
+    .test-options {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .test-options select, .test-options button {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .test-question h3 {
+        font-size: 16px;
+    }
+    
+    .test-footer {
+        text-align: center;
+    }
+    
+    .test-footer button {
+        width: 100%;
+    }
+}
+
+/* 复习模式 */
+.review-controls {
+    margin-bottom: 20px;
+}
+
+.review-options {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap; /* 允许在小屏幕上换行 */
+}
+
+.review-options select {
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    height: 44px; /* 增大触摸区域 */
+    flex: 1;
+    min-width: 120px;
+}
+
+.review-options button {
+    padding: 10px 15px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    min-height: 44px; /* 增大触摸区域 */
+    min-width: 100px;
+}
+
+.review-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.review-header {
+    margin-bottom: 20px;
+}
+
+.review-count {
+    font-size: 14px;
+    color: #7f8c8d;
+}
+
+.word-front, .word-back {
+    text-align: center;
+}
+
+.hidden {
+    display: none;
+}
+
+.flip-btn {
+    padding: 10px 15px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 15px;
+    min-height: 44px; /* 增大触摸区域 */
+    min-width: 120px;
+}
+
+.review-feedback {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap; /* 允许在小屏幕上换行 */
+}
+
+.feedback-btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    min-height: 44px; /* 增大触摸区域 */
+    min-width: 80px;
+    flex: 1;
+}
+
+.feedback-btn.easy {
+    background-color: #2ecc71;
+    color: white;
+}
+
+.feedback-btn.medium {
+    background-color: #f39c12;
+    color: white;
+}
+
+.feedback-btn.hard {
+    background-color: #e74c3c;
+    color: white;
+}
+
+/* 移动端复习模式样式 */
+@media (max-width: 768px) {
+    .review-options {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .review-options select, .review-options button {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .flip-btn {
+        width: 100%;
+    }
+    
+    .review-feedback {
+        flex-direction: row;
+    }
+}
+
+footer {
+    text-align: center;
+    margin-top: 30px;
+    padding: 15px 0;
+    color: #7f8c8d;
+    font-size: 14px;
+    border-top: 1px solid #e0e0e0;
+    word-break: break-word; /* 防止长文本溢出 */
+}
+
+footer a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+/* 移动端页脚样式 */
+@media (max-width: 768px) {
+    footer {
+        font-size: 12px;
+        padding: 10px 0;
+        margin-top: 20px;
+    }
+}
+
+/* 统计页面 */
+.stats-container {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.stats-card {
+    flex: 1;
+    min-width: 280px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+}
+
+.stats-card h3 {
+    margin-bottom: 15px;
+    color: #2c3e50;
+    font-size: 18px;
+    text-align: center;
+}
+
+.progress-chart {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.progress-circle {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: conic-gradient(#3498db 0% 0%, #ecf0f1 0% 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.progress-circle::before {
+    content: '';
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background-color: white;
+}
+
+.progress-text {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+}
+
+.percentage {
+    font-size: 24px;
+    font-weight: bold;
+    color: #2c3e50;
+    display: block;
+}
+
+.progress-label {
+    font-size: 14px;
+    color: #7f8c8d;
+}
+
+.stats-details {
+    margin-top: 20px;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.stat-item:last-child {
+    border-bottom: none;
+}
+
+/* 移动端统计页面样式 */
+@media (max-width: 768px) {
+    .stats-container {
+        flex-direction: column;
+    }
+    
+    .stats-card {
+        width: 100%;
+        min-width: auto;
+    }
+    
+    .progress-circle {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .progress-circle::before {
+        width: 90px;
+        height: 90px;
+    }
+    
+    .percentage {
+        font-size: 20px;
+    }
+    
+    .progress-label {
+        font-size: 12px;
+    }
+}

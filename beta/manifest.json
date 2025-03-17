@@ -1,0 +1,16 @@
+{
+  "name": "个人单词学习助手",
+  "short_name": "单词助手",
+  "description": "一个帮助你学习英语单词的个人助手",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3498db",
+  "icons": [
+    {
+      "src": "word3500-master/img/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
