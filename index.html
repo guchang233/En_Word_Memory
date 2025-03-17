@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人单词学习助手</title>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <img src="word3500-master/img/logo.png" alt="单词学习助手">
+                <h1>个人单词学习助手</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#" class="active" data-section="study">学习模式</a></li>
+                    <li><a href="#" data-section="test">测试模式</a></li>
+                    <li><a href="#" data-section="review">复习模式</a></li>
+                    <li><a href="#" data-section="stats">学习统计</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <!-- 学习模式 -->
+            <section id="study" class="section-active">
+                <div class="controls">
+                    <div class="search-box">
+                        <input type="text" id="word-search" placeholder="搜索单词...">
+                        <button id="search-btn"><i class="fa fa-search"></i></button>
+                    </div>
+                    <div class="filter-options">
+                        <select id="filter-type">
+                            <option value="all">所有单词</option>
+                            <option value="starred">已标记单词</option>
+                            <option value="learned">已学习单词</option>
+                            <option value="unlearned">未学习单词</option>
+                        </select>
+                        <div class="page-controls">
+                            <button id="prev-page"><i class="fa fa-arrow-left"></i></button>
+                            <span id="page-info">第 <span id="current-page">1</span> 页</span>
+                            <button id="next-page"><i class="fa fa-arrow-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="word-container">
+                    <div class="word-card" id="current-word">
+                        <div class="word-header">
+                            <span class="word-id">#1</span>
+                            <button class="star-btn"><i class="fa fa-star-o"></i></button>
+                        </div>
+                        <div class="word-content">
+                            <h2 class="word-text">abandon</h2>
+                            <div class="pronunciation">
+                                <span>[əˈbændən]</span>
+                                <div class="audio-controls">
+                                    <button class="accent-btn uk" title="英式发音"><img src="word3500-master/img/gb.png" alt="UK"></button>
+                                    <button class="accent-btn us" title="美式发音"><img src="word3500-master/img/us.png" alt="US"></button>
+                                </div>
+                            </div>
+                            <div class="meaning">v.抛弃，舍弃，放弃</div>
+                        </div>
+                        <div class="word-footer">
+                            <button class="mark-learned-btn">标记为已学习</button>
+                            <button class="auto-play-btn"><i class="fa fa-play"></i> 自动播放</button>
+                        </div>
+                    </div>
+
+                    <div class="word-list">
+                        <h3>单词列表</h3>
+                        <ul id="words">
+                            <!-- 单词列表将通过JavaScript动态生成 -->
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 测试模式 -->
+            <section id="test">
+                <div class="test-controls">
+                    <div class="test-options">
+                        <select id="test-type">
+                            <option value="word-meaning">单词 → 含义</option>
+                            <option value="meaning-word">含义 → 单词</option>
+                            <option value="spelling">拼写测试</option>
+                        </select>
+                        <select id="test-range">
+                            <option value="all">所有单词</option>
+                            <option value="starred">已标记单词</option>
+                            <option value="learned">已学习单词</option>
+                            <option value="unlearned">未学习单词</option>
+                        </select>
+                        <button id="start-test-btn">开始测试</button>
+                    </div>
+                </div>
+
+                <div class="test-container">
+                    <div class="test-card">
+                        <div class="test-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill"></div>
+                            </div>
+                            <span class="progress-text">1/20</span>
+                        </div>
+                        <div class="test-question">
+                            <h3>请选择单词 "abandon" 的中文含义：</h3>
+                        </div>
+                        <div class="test-options">
+                            <div class="option">A. 抛弃，舍弃，放弃</div>
+                            <div class="option">B. 能力，才能</div>
+                            <div class="option">C. 能够，有能力的</div>
+                            <div class="option">D. 反常的，变态的</div>
+                        </div>
+                        <div class="test-footer">
+                            <button id="next-question-btn">下一题</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 复习模式 -->
+            <section id="review">
+                <div class="review-controls">
+                    <div class="review-options">
+                        <select id="review-type">
+                            <option value="spaced">间隔复习</option>
+                            <option value="random">随机复习</option>
+                            <option value="difficult">难词复习</option>
+                        </select>
+                        <button id="start-review-btn">开始复习</button>
+                    </div>
+                </div>
+
+                <div class="review-container">
+                    <div class="review-card">
+                        <div class="review-header">
+                            <span class="review-count">复习进度：1/30</span>
+                        </div>
+                        <div class="word-content">
+                            <div class="word-front">
+                                <h2 class="word-text">abandon</h2>
+                                <button class="flip-btn">查看含义</button>
+                            </div>
+                            <div class="word-back hidden">
+                                <div class="pronunciation">[əˈbændən]</div>
+                                <div class="meaning">v.抛弃，舍弃，放弃</div>
+                                <div class="review-feedback">
+                                    <button class="feedback-btn easy">简单</button>
+                                    <button class="feedback-btn medium">一般</button>
+                                    <button class="feedback-btn hard">困难</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 学习统计 -->
+            <section id="stats">
+                <div class="stats-container">
+                    <div class="stats-card">
+                        <h3>学习进度</h3>
+                        <div class="progress-chart">
+                            <div class="progress-circle">
+                                <div class="progress-text">
+                                    <span class="percentage">0%</span>
+                                    <span class="progress-label">已学习</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stats-details">
+                            <div class="stat-item">
+                                <span class="stat-label">总单词数：</span>
+                                <span class="stat-value">3500</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">已学习：</span>
+                                <span class="stat-value">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">已标记：</span>
+                                <span class="stat-value">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">测试正确率：</span>
+                                <span class="stat-value">0%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stats-card">
+                        <h3>学习日历</h3>
+                        <div class="calendar-container">
+                            <!-- 日历将通过JavaScript动态生成 -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>基于 <a href="https://github.com/pluto0x0/word3500" target="_blank">word3500</a> 词库 | 个人单词学习助手 &copy; 2023</p>
+        </footer>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
