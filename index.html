@@ -2,11 +2,18 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+    <meta name="theme-color" content="#3498db">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>个人单词学习助手</title>
+    <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.css">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="word3500-master/img/logo.png">
+    <link rel="apple-touch-icon" href="word3500-master/img/logo.png">
     <script src="https://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+    <script src="js/test.js"></script>
 </head>
 <body>
     <div class="container">
@@ -209,5 +216,17 @@
     </div>
 
     <script src="js/app.js"></script>
+    <script>
+        // 注册Service Worker实现PWA功能
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('sw.js').then(function(registration) {
+                    console.log('ServiceWorker注册成功: ', registration.scope);
+                }).catch(function(error) {
+                    console.log('ServiceWorker注册失败: ', error);
+                });
+            });
+        }
+    </script>
 </body>
 </html>

@@ -5,9 +5,7 @@ let currentPage = 1;
 let wordsPerPage = 50;
 let filterType = 'all';
 let isPlaying = false;
-let testWords = [];
-let testIndex = 0;
-let testScore = 0;
+// 测试变量已移至test.js
 let learnedWords = [];
 let starredWords = [];
 
@@ -21,6 +19,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 初始化事件监听
     initEventListeners();
+    
+    // 初始化移动端触摸事件
+    initTouchEvents();
+    
+    // 初始化测试模块
+    if (window.TestModule && typeof window.TestModule.init === 'function') {
+        window.TestModule.init();
+    }
 });
 
 // 初始化导航切换
@@ -175,9 +181,7 @@ function initEventListeners() {
         playWordAudio(words[currentWordIndex].word, 0); // 美式发音
     });
     
-    // 测试按钮
-    document.getElementById('start-test-btn').addEventListener('click', startTest);
-    document.getElementById('next-question-btn').addEventListener('click', nextTestQuestion);
+    // 测试按钮事件监听已移至test.js
     
     // 复习按钮
     document.getElementById('start-review-btn').addEventListener('click', startReview);
@@ -412,215 +416,13 @@ function updateStats() {
     document.querySelectorAll('.stat-value')[3].textContent = localStorage.getItem('testAccuracy') || '0%';
 }
 
-// 开始测试
-function startTest() {
-    const testType = document.getElementById('test-type').value;
-    const testRange = document.getElementById('test-range').value;
-    
-    // 根据范围选择测试单词
-    let wordsToTest = [];
-    switch (testRange) {
-        case 'starred':
-            wordsToTest = words.filter(word => word.starred);
-            break;
-        case 'learned':
-            wordsToTest = words.filter(word => word.learned);
-            break;
-        case 'unlearned':
-            wordsToTest = words.filter(word => !word.learned);
-            break;
-        default:
-            wordsToTest = [...words];
-    }
-    
-    // 如果没有可测试的单词
-    if (wordsToTest.length === 0) {
-        alert('没有可测试的单词！');
-        return;
-    }
-    
-    // 随机选择20个单词（或全部，如果少于20个）
-    testWords = [];
-    const testCount = Math.min(wordsToTest.length, 20);
-    const shuffled = [...wordsToTest].sort(() => 0.5 - Math.random());
-    testWords = shuffled.slice(0, testCount);
-    
-    // 重置测试状态
-    testIndex = 0;
-    testScore = 0;
-    
-    // 显示第一个测试题
-    displayTestQuestion(testType);
-}
+// 测试函数已移至test.js
 
-// 显示测试题目
-function displayTestQuestion(testType) {
-    if (testIndex >= testWords.length) {
-        // 测试结束
-        finishTest();
-        return;
-    }
-    
-    const currentTestWord = testWords[testIndex];
-    const testQuestion = document.querySelector('.test-question h3');
-    const optionsContainer = document.querySelector('.test-options');
-    optionsContainer.innerHTML = '';
-    
-    // 更新进度条
-    const progressPercentage = ((testIndex + 1) / testWords.length) * 100;
-    document.querySelector('.progress-fill').style.width = `${progressPercentage}%`;
-    document.querySelector('.progress-text').textContent = `${testIndex + 1}/${testWords.length}`;
-    
-    // 根据测试类型生成题目
-    if (testType === 'word-meaning') {
-        // 单词 → 含义
-        testQuestion.textContent = `请选择单词 "${currentTestWord.word}" 的中文含义：`;
-        
-        // 生成选项（1个正确答案，3个干扰项）
-        const options = generateOptions(currentTestWord, 'meaning');
-        options.forEach((option, index) => {
-            const optionDiv = document.createElement('div');
-            optionDiv.className = 'option';
-            optionDiv.textContent = `${String.fromCharCode(65 + index)}. ${option}`;
-            optionDiv.dataset.correct = option === currentTestWord.meaning;
-            
-            optionDiv.addEventListener('click', function() {
-                // 移除之前的选择
-                document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
-                
-                // 标记当前选择
-                this.classList.add('selected');
-            });
-            
-            optionsContainer.appendChild(optionDiv);
-        });
-    } else if (testType === 'meaning-word') {
-        // 含义 → 单词
-        testQuestion.textContent = `请选择 "${currentTestWord.meaning}" 对应的英文单词：`;
-        
-        // 生成选项
-        const options = generateOptions(currentTestWord, 'word');
-        options.forEach((option, index) => {
-            const optionDiv = document.createElement('div');
-            optionDiv.className = 'option';
-            optionDiv.textContent = `${String.fromCharCode(65 + index)}. ${option}`;
-            optionDiv.dataset.correct = option === currentTestWord.word;
-            
-            optionDiv.addEventListener('click', function() {
-                document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
-                this.classList.add('selected');
-            });
-            
-            optionsContainer.appendChild(optionDiv);
-        });
-    } else if (testType === 'spelling') {
-        // 拼写测试
-        testQuestion.textContent = `请输入 "${currentTestWord.meaning}" 对应的英文单词：`;
-        
-        const inputDiv = document.createElement('div');
-        inputDiv.className = 'spelling-input';
-        
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.placeholder = '请输入单词...';
-        input.id = 'spelling-answer';
-        
-        inputDiv.appendChild(input);
-        optionsContainer.appendChild(inputDiv);
-    }
-}
+// 测试函数已移至test.js
 
-// 生成测试选项
-function generateOptions(currentWord, type) {
-    // 正确答案
-    const correctAnswer = type === 'meaning' ? currentWord.meaning : currentWord.word;
-    
-    // 随机选择3个干扰项
-    const otherWords = words.filter(w => w.id !== currentWord.id);
-    const shuffled = [...otherWords].sort(() => 0.5 - Math.random());
-    const distractors = shuffled.slice(0, 3).map(w => type === 'meaning' ? w.meaning : w.word);
-    
-    // 合并选项并随机排序
-    const options = [correctAnswer, ...distractors];
-    return options.sort(() => 0.5 - Math.random());
-}
+// 测试函数已移至test.js
 
-// 下一个测试题
-function nextTestQuestion() {
-    const testType = document.getElementById('test-type').value;
-    
-    // 检查答案
-    if (testType === 'spelling') {
-        const input = document.getElementById('spelling-answer');
-        const userAnswer = input.value.trim().toLowerCase();
-        const correctAnswer = testWords[testIndex].word.toLowerCase();
-        
-        if (userAnswer === correctAnswer) {
-            testScore++;
-        }
-    } else {
-        const selectedOption = document.querySelector('.option.selected');
-        
-        if (selectedOption && selectedOption.dataset.correct === 'true') {
-            testScore++;
-        }
-    }
-    
-    // 进入下一题
-    testIndex++;
-    displayTestQuestion(testType);
-}
-
-// 完成测试
-function finishTest() {
-    const accuracy = Math.round((testScore / testWords.length) * 100);
-    
-    // 保存测试正确率
-    localStorage.setItem('testAccuracy', `${accuracy}%`);
-    
-    // 显示结果
-    const testCard = document.querySelector('.test-card');
-    testCard.innerHTML = `
-        <div class="test-result">
-            <h3>测试完成！</h3>
-            <div class="result-details">
-                <p>总题数: ${testWords.length}</p>
-                <p>正确数: ${testScore}</p>
-                <p>正确率: ${accuracy}%</p>
-            </div>
-            <button id="back-to-test" class="back-btn">返回</button>
-        </div>
-    `;
-    
-    // 更新统计信息
-    updateStats();
-    
-    // 返回按钮事件
-    document.getElementById('back-to-test').addEventListener('click', function() {
-        // 重置测试界面
-        const testCard = document.querySelector('.test-card');
-        testCard.innerHTML = `
-            <div class="test-progress">
-                <div class="progress-bar">
-                    <div class="progress-fill"></div>
-                </div>
-                <span class="progress-text">1/20</span>
-            </div>
-            <div class="test-question">
-                <h3>请选择单词的中文含义：</h3>
-            </div>
-            <div class="test-options">
-                <!-- 选项将通过JavaScript动态生成 -->
-            </div>
-            <div class="test-footer">
-                <button id="next-question-btn">下一题</button>
-            </div>
-        `;
-        
-        // 重新绑定事件
-        document.getElementById('next-question-btn').addEventListener('click', nextTestQuestion);
-    });
-}
+// 测试函数已移至test.js
 
 // 开始复习
 function startReview() {
@@ -728,5 +530,99 @@ function provideReviewFeedback(difficulty) {
             // 复习完成
             alert('复习完成！');
         }
+    }
+}
+
+// 初始化移动端触摸事件
+function initTouchEvents() {
+    // 单词卡片滑动手势
+    const wordCard = document.getElementById('current-word');
+    let touchStartX = 0;
+    let touchEndX = 0;
+    
+    // 触摸开始事件
+    wordCard.addEventListener('touchstart', function(e) {
+        touchStartX = e.changedTouches[0].screenX;
+    }, false);
+    
+    // 触摸结束事件
+    wordCard.addEventListener('touchend', function(e) {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+    }, false);
+    
+    // 处理滑动手势
+    function handleSwipe() {
+        // 向左滑动 - 下一个单词
+        if (touchEndX < touchStartX - 50) {
+            if (currentWordIndex < words.length - 1) {
+                currentWordIndex++;
+                displayCurrentWord();
+                updateWordList();
+            }
+        }
+        // 向右滑动 - 上一个单词
+        if (touchEndX > touchStartX + 50) {
+            if (currentWordIndex > 0) {
+                currentWordIndex--;
+                displayCurrentWord();
+                updateWordList();
+            }
+        }
+    }
+    
+    // 复习卡片滑动手势
+    const reviewCard = document.querySelector('.review-card');
+    if (reviewCard) {
+        reviewCard.addEventListener('touchstart', function(e) {
+            touchStartX = e.changedTouches[0].screenX;
+        }, false);
+        
+        reviewCard.addEventListener('touchend', function(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            // 向左滑动 - 困难
+            if (touchEndX < touchStartX - 50) {
+                const hardBtn = document.querySelector('.feedback-btn.hard');
+                if (hardBtn && !document.querySelector('.word-front').classList.contains('hidden')) {
+                    flipReviewCard();
+                } else if (hardBtn) {
+                    hardBtn.click();
+                }
+            }
+            // 向右滑动 - 简单
+            if (touchEndX > touchStartX + 50) {
+                const easyBtn = document.querySelector('.feedback-btn.easy');
+                if (easyBtn && !document.querySelector('.word-front').classList.contains('hidden')) {
+                    flipReviewCard();
+                } else if (easyBtn) {
+                    easyBtn.click();
+                }
+            }
+        }, false);
+    }
+    
+    // 测试卡片滑动手势
+    const testCard = document.querySelector('.test-card');
+    if (testCard) {
+        testCard.addEventListener('touchstart', function(e) {
+            touchStartX = e.changedTouches[0].screenX;
+        }, false);
+        
+        testCard.addEventListener('touchend', function(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            // 向左滑动 - 下一题
+            if (touchEndX < touchStartX - 50) {
+                const nextBtn = document.getElementById('next-question-btn');
+                if (nextBtn) {
+                    nextBtn.click();
+                }
+            }
+        }, false);
+    }
+    
+    // 为单词列表添加触摸滚动优化
+    const wordList = document.querySelector('.word-list');
+    if (wordList) {
+        wordList.style.overscrollBehavior = 'contain'; // 防止滚动穿透
     }
 }
