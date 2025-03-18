@@ -135,6 +135,13 @@ function initEventListeners() {
         if (e.key === 'Enter') searchWord();
     });
     
+    // 搜索框内容变化时，如果清空了搜索框，则隐藏搜索结果
+    document.getElementById('word-search').addEventListener('input', function(e) {
+        if (this.value.trim() === '') {
+            hideSearchResults();
+        }
+    });
+    
     // 过滤选择
     document.getElementById('filter-type').addEventListener('change', function() {
         filterType = this.value;
@@ -283,15 +290,23 @@ function getFilteredWords() {
 // 搜索单词
 function searchWord() {
     const searchInput = document.getElementById('word-search').value.trim().toLowerCase();
-    if (!searchInput) return;
+    if (!searchInput) {
+        hideSearchResults();
+        return;
+    }
     
-    const foundIndex = words.findIndex(word => 
+    // 查找所有匹配的单词
+    const foundWords = words.filter(word => 
         word.word.toLowerCase().includes(searchInput) || 
         word.meaning.toLowerCase().includes(searchInput)
     );
     
-    if (foundIndex !== -1) {
-        currentWordIndex = foundIndex;
+    if (foundWords.length > 0) {
+        // 显示搜索结果
+        displaySearchResults(foundWords, searchInput);
+        
+        // 同时显示第一个匹配的单词
+        currentWordIndex = words.indexOf(foundWords[0]);
         displayCurrentWord();
         
         // 计算页码
@@ -304,6 +319,7 @@ function searchWord() {
         }
     } else {
         alert('未找到匹配的单词！');
+        hideSearchResults();
     }
 }
 
@@ -399,6 +415,100 @@ function autoPlayNext() {
 function playWordAudio(word, accent) {
     const audio = new Audio(`https://dict.youdao.com/dictvoice?type=${accent}&audio=${word}`);
     audio.play();
+}
+
+// 显示搜索结果
+function displaySearchResults(foundWords, searchInput) {
+    // 检查搜索结果容器是否存在，不存在则创建
+    let searchResultsContainer = document.getElementById('search-results-container');
+    if (!searchResultsContainer) {
+        searchResultsContainer = document.createElement('div');
+        searchResultsContainer.id = 'search-results-container';
+        searchResultsContainer.className = 'search-results-container';
+        
+        // 将搜索结果容器插入到搜索框下方
+        const searchBox = document.querySelector('.search-box');
+        searchBox.parentNode.insertBefore(searchResultsContainer, searchBox.nextSibling);
+    }
+    
+    // 清空并填充搜索结果
+    searchResultsContainer.innerHTML = '';
+    
+    // 创建搜索结果标题
+    const resultsTitle = document.createElement('h3');
+    resultsTitle.textContent = `搜索结果 (${foundWords.length})`;
+    searchResultsContainer.appendChild(resultsTitle);
+    
+    // 创建搜索结果列表
+    const resultsList = document.createElement('ul');
+    resultsList.className = 'search-results-list';
+    
+    // 添加搜索结果项
+    foundWords.forEach(word => {
+        const listItem = document.createElement('li');
+        
+        // 创建单词文本元素
+        const wordText = document.createElement('div');
+        wordText.className = 'result-word';
+        wordText.textContent = word.word;
+        
+        // 创建单词释义元素
+        const meaningText = document.createElement('div');
+        meaningText.className = 'result-meaning';
+        
+        // 高亮显示匹配的中文部分
+        if (word.meaning.toLowerCase().includes(searchInput)) {
+            const meaningLower = word.meaning.toLowerCase();
+            const startIndex = meaningLower.indexOf(searchInput);
+            const endIndex = startIndex + searchInput.length;
+            
+            meaningText.innerHTML = 
+                word.meaning.substring(0, startIndex) + 
+                '<span class="highlight">' + 
+                word.meaning.substring(startIndex, endIndex) + 
+                '</span>' + 
+                word.meaning.substring(endIndex);
+        } else {
+            meaningText.textContent = word.meaning;
+        }
+        
+        // 将元素添加到列表项
+        listItem.appendChild(wordText);
+        listItem.appendChild(meaningText);
+        
+        // 添加点击事件
+        listItem.addEventListener('click', function() {
+            currentWordIndex = words.indexOf(word);
+            displayCurrentWord();
+            
+            // 更新单词列表
+            const filteredWords = getFilteredWords();
+            const wordIndexInFiltered = filteredWords.indexOf(word);
+            if (wordIndexInFiltered !== -1) {
+                currentPage = Math.floor(wordIndexInFiltered / wordsPerPage) + 1;
+                updateWordList();
+            }
+            
+            // 高亮显示当前选中的搜索结果
+            document.querySelectorAll('.search-results-list li').forEach(item => {
+                item.classList.remove('active');
+            });
+            this.classList.add('active');
+        });
+        
+        resultsList.appendChild(listItem);
+    });
+    
+    searchResultsContainer.appendChild(resultsList);
+    searchResultsContainer.style.display = 'block';
+}
+
+// 隐藏搜索结果
+function hideSearchResults() {
+    const searchResultsContainer = document.getElementById('search-results-container');
+    if (searchResultsContainer) {
+        searchResultsContainer.style.display = 'none';
+    }
 }
 
 // 更新统计信息
