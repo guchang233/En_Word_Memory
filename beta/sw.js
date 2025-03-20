@@ -1,15 +1,19 @@
 // 缓存名称和要缓存的文件列表
-const CACHE_NAME = 'word-helper-cache-v1';
+const CACHE_NAME = 'word-helper-cache-v2';
 const urlsToCache = [
   './',
   './index.html',
   './css/style.css',
+  './css/search-results.css',
   './js/app.js',
+  './js/test.js',
   './manifest.json',
   './word3500-master/3500.txt',
   './word3500-master/img/logo.png',
   './word3500-master/img/gb.png',
   './word3500-master/img/us.png',
+  './word3500-master/img/gb_.png',
+  './word3500-master/img/us_.png',
   'https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.css',
   'https://libs.baidu.com/jquery/2.0.0/jquery.min.js'
 ];

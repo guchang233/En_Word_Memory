@@ -135,6 +135,46 @@ function initEventListeners() {
         if (e.key === 'Enter') searchWord();
     });
     
+    // 测试历史记录日期筛选
+    const dateFilter = document.getElementById('test-history-date-filter');
+    if (dateFilter) {
+        dateFilter.addEventListener('change', function() {
+            loadTestHistory(this.value);
+        });
+    }
+    
+    // 清除测试历史记录
+    const clearHistoryBtn = document.getElementById('clear-test-history');
+    if (clearHistoryBtn) {
+        clearHistoryBtn.addEventListener('click', clearTestHistory);
+    }
+}
+
+// 清除测试历史记录
+function clearTestHistory() {
+    // 确认是否清除
+    if (confirm('确定要清除所有测试历史记录吗？此操作不可恢复。')) {
+        // 清除localStorage中的测试历史记录
+        localStorage.removeItem('allTestHistory');
+        localStorage.removeItem('testAccuracy');
+        
+        // 重置全局变量
+        if (typeof window.TestModule !== 'undefined' && typeof window.TestModule.resetTestHistory === 'function') {
+            window.TestModule.resetTestHistory();
+        }
+        
+        // 更新界面
+        loadTestHistory();
+        
+        // 更新统计信息
+        updateStats();
+        
+        alert('测试历史记录已清除！');
+    }
+}
+
+// 初始化事件监听
+    
     // 搜索框内容变化时，如果清空了搜索框，则隐藏搜索结果
     document.getElementById('word-search').addEventListener('input', function(e) {
         if (this.value.trim() === '') {
@@ -204,7 +244,6 @@ function initEventListeners() {
             provideReviewFeedback(difficulty);
         });
     });
-}
 
 // 显示当前单词
 function displayCurrentWord() {
@@ -524,6 +563,9 @@ function updateStats() {
     document.querySelectorAll('.stat-value')[1].textContent = learnedWords.length;
     document.querySelectorAll('.stat-value')[2].textContent = starredWords.length;
     document.querySelectorAll('.stat-value')[3].textContent = localStorage.getItem('testAccuracy') || '0%';
+    
+    // 更新测试历史记录
+    loadTestHistory();
 }
 
 // 测试函数已移至test.js
@@ -620,31 +662,220 @@ function provideReviewFeedback(difficulty) {
         const total = parseInt(match[2]);
         
         if (currentIndex < total) {
-            // 继续下一个单词
-            const nextIndex = words.findIndex((word, idx) => {
-                return idx > currentWordIndex && (
-                    (word.learned && document.getElementById('review-type').value === 'spaced') ||
-                    (document.getElementById('review-type').value === 'random') ||
-                    (word.starred && document.getElementById('review-type').value === 'difficult')
-                );
-            });
+            // 获取当前复习类型
+            const reviewType = document.getElementById('review-type').value;
             
-            if (nextIndex !== -1) {
-                currentWordIndex = nextIndex;
+            // 根据复习类型筛选符合条件的单词
+            let filteredWords = [];
+            switch (reviewType) {
+                case 'spaced':
+                    filteredWords = words.filter(word => word.learned);
+                    break;
+                case 'random':
+                    filteredWords = [...words];
+                    break;
+                case 'difficult':
+                    filteredWords = words.filter(word => word.starred);
+                    break;
+            }
+            
+            // 找出下一个符合条件的单词索引
+            const currentWordInFiltered = filteredWords.findIndex(word => word.id === currentWord.id);
+            if (currentWordInFiltered < filteredWords.length - 1) {
+                // 还有下一个单词
+                const nextWord = filteredWords[currentWordInFiltered + 1];
+                currentWordIndex = words.findIndex(word => word.id === nextWord.id);
                 updateReviewCard(currentIndex, total);
             } else {
-                // 如果找不到下一个符合条件的单词，回到第一个
-                alert('复习完成！');
+                // 已经是最后一个单词
+                showReviewComplete();
             }
         } else {
             // 复习完成
-            alert('复习完成！');
+            showReviewComplete();
         }
     }
 }
 
-// 初始化移动端触摸事件
-function initTouchEvents() {
+// 显示复习完成界面
+function showReviewComplete() {
+    const reviewCard = document.querySelector('.review-card');
+    reviewCard.innerHTML = `
+        <div class="review-complete">
+            <h3>复习完成！</h3>
+            <p>你已完成本次单词复习</p>
+            <button id="back-to-review" class="back-btn">返回复习界面</button>
+        </div>
+    `;
+    
+    // 绑定返回按钮事件
+    document.getElementById('back-to-review').addEventListener('click', function() {
+        // 重置复习界面
+        reviewCard.innerHTML = `
+            <div class="review-header">
+                <span class="review-count">复习进度：1/30</span>
+            </div>
+            <div class="word-content">
+                <div class="word-front">
+                    <h2 class="word-text">abandon</h2>
+                    <button class="flip-btn">查看含义</button>
+                </div>
+                <div class="word-back hidden">
+                    <div class="pronunciation">[əˈbændən]</div>
+                    <div class="meaning">v.抛弃，舍弃，放弃</div>
+                    <div class="review-feedback">
+                        <button class="feedback-btn easy">简单</button>
+                        <button class="feedback-btn medium">一般</button>
+                        <button class="feedback-btn hard">困难</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // 重新绑定事件
+        document.querySelector('.flip-btn').addEventListener('click', flipReviewCard);
+        document.querySelectorAll('.feedback-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const difficulty = this.classList.contains('easy') ? 'easy' : 
+                                 this.classList.contains('medium') ? 'medium' : 'hard';
+                provideReviewFeedback(difficulty);
+            });
+        });
+    });
+}
+
+// 加载测试历史记录
+function loadTestHistory(dateFilter = 'all') {
+    const historyList = document.getElementById('test-history-list');
+    if (!historyList) return;
+    
+    // 从localStorage获取测试历史记录
+    const savedHistory = localStorage.getItem('allTestHistory');
+    let allHistory = savedHistory ? JSON.parse(savedHistory) : {};
+    
+    // 更新日期筛选选项
+    updateDateFilterOptions(allHistory);
+    
+    // 清空历史记录列表
+    historyList.innerHTML = '';
+    
+    // 如果没有历史记录
+    if (Object.keys(allHistory).length === 0) {
+        historyList.innerHTML = '<div class="empty-history-message">暂无测试记录</div>';
+        return;
+    }
+    
+    // 按日期排序（最新的在前面）
+    const sortedDates = Object.keys(allHistory).sort((a, b) => new Date(b) - new Date(a));
+    
+    // 筛选日期
+    const datesToShow = dateFilter === 'all' ? sortedDates : [dateFilter];
+    
+    // 遍历日期
+    let hasRecords = false;
+    datesToShow.forEach(date => {
+        if (!allHistory[date] || (dateFilter !== 'all' && date !== dateFilter)) return;
+        
+        // 按时间戳排序（最新的在前面）
+        const sortedRecords = allHistory[date].sort((a, b) => b.timestamp - a.timestamp);
+        
+        sortedRecords.forEach(record => {
+            hasRecords = true;
+            const historyItem = document.createElement('div');
+            historyItem.className = 'test-history-item';
+            
+            // 格式化日期和时间
+            const recordDate = new Date(record.timestamp);
+            const formattedTime = recordDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            // 创建历史记录项内容
+            historyItem.innerHTML = `
+                <div class="test-history-header">
+                    <span class="test-history-date">${date} ${formattedTime}</span>
+                    <span class="test-history-accuracy">${record.accuracy}%</span>
+                </div>
+                <div class="test-history-details">
+                    <span>题数: ${record.total}</span>
+                    <span>正确: ${record.score}</span>
+                </div>
+                <div class="test-history-expanded">
+                    <div class="review-list">
+                        ${generateHistoryDetails(record.details)}
+                    </div>
+                </div>
+            `;
+            
+            // 点击展开/收起详情
+            historyItem.addEventListener('click', function() {
+                this.classList.toggle('active');
+            });
+            
+            historyList.appendChild(historyItem);
+        });
+    });
+    
+    // 如果筛选后没有记录
+    if (!hasRecords) {
+        historyList.innerHTML = '<div class="empty-history-message">该日期没有测试记录</div>';
+    }
+}
+
+// 生成历史记录详情HTML
+function generateHistoryDetails(details) {
+    if (!details || details.length === 0) return '<div class="empty-history-message">无详细记录</div>';
+    
+    let detailsHTML = '';
+    details.forEach((record, index) => {
+        detailsHTML += `
+            <div class="review-item ${record.isCorrect ? 'correct' : 'incorrect'}">
+                <div class="review-question">
+                    <span class="question-number">${index + 1}.</span>
+                    <span class="question-word">${record.word}</span>
+                </div>
+                <div class="review-answer">
+                    <div class="user-answer">
+                        <span>你的答案:</span> ${record.selectedOption}
+                    </div>
+                    <div class="correct-answer">
+                        <span>正确答案:</span> ${record.meaning}
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    return detailsHTML;
+}
+
+// 更新日期筛选选项
+function updateDateFilterOptions(allHistory) {
+    const dateFilter = document.getElementById('test-history-date-filter');
+    if (!dateFilter) return;
+    
+    // 保存当前选中的值
+    const currentValue = dateFilter.value;
+    
+    // 清空除了"所有日期"以外的选项
+    while (dateFilter.options.length > 1) {
+        dateFilter.remove(1);
+    }
+    
+    // 按日期排序（最新的在前面）
+    const sortedDates = Object.keys(allHistory).sort((a, b) => new Date(b) - new Date(a));
+    
+    // 添加日期选项
+    sortedDates.forEach(date => {
+        const option = document.createElement('option');
+        option.value = date;
+        option.textContent = date;
+        dateFilter.appendChild(option);
+    });
+    
+    // 恢复之前选中的值（如果存在）
+    if (sortedDates.includes(currentValue)) {
+        dateFilter.value = currentValue;
+    }
+}
     // 单词卡片滑动手势
     const wordCard = document.getElementById('current-word');
     let touchStartX = 0;
@@ -735,4 +966,3 @@ function initTouchEvents() {
     if (wordList) {
         wordList.style.overscrollBehavior = 'contain'; // 防止滚动穿透
     }
-}

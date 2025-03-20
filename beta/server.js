@@ -1,56 +1,62 @@
-const http = require('http');
-const fs = require('fs');
+const express = require('express');
 const path = require('path');
+const net = require('net');
+const app = express();
+const DEFAULT_PORT = process.env.PORT || 8080;
 
-const PORT = 8080;
+// 检查端口是否可用
+function isPortAvailable(port) {
+    return new Promise((resolve) => {
+        const server = net.createServer();
+        server.once('error', () => {
+            resolve(false);
+        });
+        server.once('listening', () => {
+            server.close();
+            resolve(true);
+        });
+        server.listen(port);
+    });
+}
 
-const MIME_TYPES = {
-  '.html': 'text/html',
-  '.css': 'text/css',
-  '.js': 'text/javascript',
-  '.json': 'application/json',
-  '.png': 'image/png',
-  '.jpg': 'image/jpeg',
-  '.gif': 'image/gif',
-  '.svg': 'image/svg+xml',
-  '.ico': 'image/x-icon',
-  '.txt': 'text/plain'
-};
-
-const server = http.createServer((req, res) => {
-  console.log(`请求: ${req.url}`);
-  
-  // 处理根路径请求
-  let filePath = req.url === '/' ? './index.html' : '.' + req.url;
-  
-  // 获取文件扩展名
-  const extname = path.extname(filePath);
-  let contentType = MIME_TYPES[extname] || 'application/octet-stream';
-  
-  // 读取文件
-  fs.readFile(filePath, (err, content) => {
-    if (err) {
-      if (err.code === 'ENOENT') {
-        // 文件不存在
-        console.log(`文件不存在: ${filePath}`);
-        res.writeHead(404);
-        res.end('404 - 文件不存在');
-      } else {
-        // 服务器错误
-        console.log(`服务器错误: ${err.code}`);
-        res.writeHead(500);
-        res.end(`服务器错误: ${err.code}`);
-      }
-    } else {
-      // 成功响应
-      res.writeHead(200, { 'Content-Type': contentType });
-      res.end(content, 'utf-8');
+// 查找可用端口
+async function findAvailablePort(startPort) {
+    let port = startPort;
+    while (port < startPort + 100) { // 尝试100个端口
+        if (await isPortAvailable(port)) {
+            return port;
+        }
+        port++;
     }
-  });
+    throw new Error('无法找到可用端口');
+}
+
+// 静态文件服务
+app.use(express.static(path.join(__dirname)));
+
+// 路由处理
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-server.listen(PORT, () => {
-  console.log(`服务器运行在 http://localhost:${PORT}`);
-  console.log(`请在浏览器中访问 http://localhost:${PORT} 来查看您的应用`);
-  console.log(`按 Ctrl+C 停止服务器`);
-});
+// 启动服务器
+async function startServer() {
+    try {
+        // 先尝试使用默认端口
+        const isDefaultPortAvailable = await isPortAvailable(DEFAULT_PORT);
+        const PORT = isDefaultPortAvailable ? DEFAULT_PORT : await findAvailablePort(DEFAULT_PORT + 1);
+        
+        app.listen(PORT, () => {
+            console.log(`服务器运行在 http://localhost:${PORT}`);
+            if (!isDefaultPortAvailable) {
+                console.log(`注意: 默认端口 ${DEFAULT_PORT} 已被占用，自动切换到端口 ${PORT}`);
+            }
+        });
+    } catch (error) {
+        console.error('启动服务器失败:', error.message);
+        console.log('建议: 请检查是否有其他应用占用了大量端口，或者使用 PORT 环境变量指定一个特定端口');
+        process.exit(1);
+    }
+}
+
+startServer();
